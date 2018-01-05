@@ -5,39 +5,46 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-public class Outgoings {
+public class Transactions {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true)
     private Integer id;
 
-    @Column(name = "outgoing_amount")
+    @Column(name = "amount")
     private BigDecimal amount;
+
+    @Column(name = "balance_diff")
+    private BigDecimal balanceDiff;
+
+    @Column(name = "isCredit")
+    private boolean isCredit;
 
     @Column(name = "description")
     private String description;
 
     @Column(name = "date")
-    private Date outgoingDate;
+    private Date transactionDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "outgoing_category_id", nullable = false)
-    private OutgoingsCategories outgoingsCategories;
+    @JoinColumn(name = "category_id", nullable = false)
+    private TransactionsCategories transactionsCategories;
 
-    public Outgoings(User u, OutgoingsCategories oc, BigDecimal amount, String description, Date outgoingDate) {
+    public Transactions(User u, TransactionsCategories transactionsCategories, BigDecimal amount, boolean isCredit, String description, Date transactionDate) {
         this.user = u;
-        this.outgoingsCategories = oc;
+        this.transactionsCategories = transactionsCategories;
         this.amount = amount;
+        this.isCredit = isCredit;
         this.description = description;
-        this.outgoingDate = outgoingDate;
+        this.transactionDate = transactionDate;
     }
 
-    public Outgoings() {
+    public Transactions() {
     }
 
     public Integer getId() {
@@ -56,6 +63,21 @@ public class Outgoings {
         this.amount = amount;
     }
 
+    public BigDecimal getBalanceDiff() {
+        return balanceDiff;
+    }
+
+    public void setBalanceDiff(BigDecimal balanceDiff) {
+        this.balanceDiff = balanceDiff;
+    }
+
+    public boolean isCredit() {
+        return isCredit;
+    }
+
+    public void setCredit(boolean credit) {
+        isCredit = credit;
+    }
     public String getDescription() {
         return description;
     }
@@ -64,12 +86,12 @@ public class Outgoings {
         this.description = description;
     }
 
-    public Date getOutgoingDate() {
-        return outgoingDate;
+    public Date getTransactionDate() {
+        return transactionDate;
     }
 
-    public void setOutgoingDate(Date outgoingDate) {
-        this.outgoingDate = outgoingDate;
+    public void setTransactionDate(Date transactionDate) {
+        this.transactionDate = transactionDate;
     }
 
     public User getUser() {
@@ -80,11 +102,11 @@ public class Outgoings {
         this.user = user;
     }
 
-    public OutgoingsCategories getOutgoingsCategories() {
-        return outgoingsCategories;
+    public TransactionsCategories getTransactionsCategories() {
+        return transactionsCategories;
     }
 
-    public void setOutgoingsCategories(OutgoingsCategories outgoingsCategories) {
-        this.outgoingsCategories = outgoingsCategories;
+    public void setTransactionsCategories(TransactionsCategories transactionsCategories) {
+        this.transactionsCategories = transactionsCategories;
     }
 }

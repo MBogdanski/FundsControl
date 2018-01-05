@@ -4,24 +4,24 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-public class OutgoingsCategories {
+public class TransactionsCategories {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "description")
-    private String description;
+    @Column(name = "name")
+    private String name;
 
-    @OneToMany(mappedBy = "outgoingsCategories")
-    private Set<Transactions> outgoings;
+    @OneToMany(mappedBy = "transactionsCategories")
+    private Set<Transactions> Transactions;
 
-    public OutgoingsCategories(String description) {
-        this.description = description;
+    public TransactionsCategories(String name) {
+        this.name = name;
     }
 
-    public OutgoingsCategories() {
+    public TransactionsCategories() {
     }
 
     public Integer getId() {
@@ -32,11 +32,19 @@ public class OutgoingsCategories {
         this.id = id;
     }
 
-    public String getDescription() {
-        return description;
+    public String getName() {
+        return name;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setName(String description) {
+        this.name = description;
+    }
+
+    public Set<Transactions> getTransactions() {
+        return Transactions;
+    }
+
+    public void setTransactions(Set<Transactions> transactions) {
+        Transactions = transactions;
     }
 }
