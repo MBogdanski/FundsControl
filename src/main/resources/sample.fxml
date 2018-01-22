@@ -7,17 +7,16 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="521.0" prefWidth="844.0" style="-fx-background-color: #2D3447;" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="521.0" prefWidth="844.0" style="-fx-background-color: #2D3447;" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fundsControl.controllers.MainController">
    <children>
-      <Button layoutX="328.0" layoutY="395.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="182.0" text="Sign In" />
-      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="211.0" layoutY="109.0" prefHeight="60.0" prefWidth="385.0" text="FundsControl" textAlignment="CENTER" textFill="#fcfcfc">
+      <Button fx:id="login" layoutX="328.0" layoutY="395.0" mnemonicParsing="false" onAction="#login" prefHeight="41.0" prefWidth="182.0" text="Sign In" />
+      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="211.0" layoutY="109.0" prefHeight="60.0" prefWidth="385.0" text="fundsControl" textAlignment="CENTER" textFill="#fcfcfc">
          <font>
             <Font name="SansSerif Regular" size="43.0" />
          </font>
       </Label>
-      <Label layoutX="353.0" layoutY="216.0" text="Label" />
-      <JFXTextField alignment="CENTER" focusColor="#d5d6dd" layoutX="279.0" layoutY="205.0" prefHeight="27.0" prefWidth="256.0" promptText="Email" unFocusColor="#d5d6dd" />
-      <JFXTextField alignment="CENTER" focusColor="#d5d6dd" layoutX="282.0" layoutY="266.0" prefHeight="27.0" prefWidth="256.0" promptText="Password" unFocusColor="#d5d6dd" />
+      <JFXTextField fx:id="emailTextField" alignment="CENTER" focusColor="#d5d6dd" layoutX="276.0" layoutY="204.0" prefHeight="27.0" prefWidth="256.0" promptText="Email" unFocusColor="#d5d6dd" />
+      <JFXTextField fx:id="password" alignment="CENTER" focusColor="#d5d6dd" layoutX="276.0" layoutY="262.0" prefHeight="27.0" prefWidth="256.0" promptText="Password" unFocusColor="#d5d6dd" />
       <MaterialDesignIconView glyphName="ACCOUNT" layoutX="230.0" layoutY="234.0" size="44" />
       <MaterialDesignIconView glyphName="KEY_VARIANT" layoutX="232.0" layoutY="289.0" size="36" />
       <MaterialDesignIconView fill="#272ba8" glyphName="SQUARE_INC_CASH" layoutX="357.0" layoutY="90.0" size="96" wrappingWidth="50.0" />
