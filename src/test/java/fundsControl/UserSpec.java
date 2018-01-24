@@ -13,5 +13,18 @@ import static org.testng.Assert.assertTrue;
 @Test
 public class UserSpec {
 
+    User user;
+
+    @BeforeMethod
+    public void setUp() {
+        user = new User();
+    }
+
+
+    public void whenGivenUserNameThenUserHasName () {
+        String name = "Mariusz";
+        user.setName(name);
+        assertEquals(name, user.getName());
+    }
 
 }

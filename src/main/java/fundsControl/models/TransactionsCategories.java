@@ -14,7 +14,7 @@ public class TransactionsCategories {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(mappedBy = "transactionsCategories")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "transactionsCategories")
     private Set<Transactions> Transactions;
 
     public TransactionsCategories(String name) {

@@ -1,8 +1,11 @@
 package fundsControl.models;
 
+import org.hibernate.annotations.Sort;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Set;
+import java.util.SortedSet;
 
 @Entity
 public class User {
@@ -24,7 +27,8 @@ public class User {
     @Column(name = "balance")
     private BigDecimal balance;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user", orphanRemoval = true)
+    @OrderBy
     private Set<Transactions> transactionsSet;
 
     public User(String email, String password, String name, BigDecimal balance) {
