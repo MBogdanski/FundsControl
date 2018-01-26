@@ -23,5 +23,6 @@
       <Label layoutX="659.0" layoutY="139.0" text="Balance after trx" />
       <Label layoutX="828.0" layoutY="140.0" text="Date" />
       <JFXButton fx:id="addTrx" alignment="CENTER" buttonType="RAISED" layoutX="431.0" layoutY="48.0" onAction="#openAddNewTrxWindow" prefHeight="44.0" prefWidth="182.0" style="-fx-background-color: #4286f4;" text="Add new transaction" textAlignment="CENTER" />
+      <JFXButton fx:id="addCategoryBtn" alignment="CENTER" buttonType="RAISED" layoutX="634.0" layoutY="48.0" onAction="#openAddNewCategoryWindow" prefHeight="44.0" prefWidth="182.0" ripplerFill="#0c2b0e" style="-fx-background-color: #4286f4;" text="Add new category" textAlignment="CENTER" />
    </children>
 </AnchorPane>

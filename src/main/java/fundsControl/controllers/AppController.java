@@ -1,13 +1,9 @@
 package fundsControl.controllers;
 
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXTextField;
 import fundsControl.models.Transactions;
 import fundsControl.models.User;
 import fundsControl.utils.HibernateUtil;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,7 +12,10 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -39,15 +38,21 @@ public class AppController implements Initializable {
     @FXML
     public AnchorPane mainAnchor;
 
-    private User user;
+    @FXML
+    public JFXButton addTrx;
+
+    @FXML
+    public JFXButton addCategoryBtn;
 
     @FXML
     public Button loadTrxBtn;
 
+    private User user;
+
     public void loadTrx(ActionEvent actionEvent) {
 
         Session session = HibernateUtil.openSession();
-
+        session.refresh(user);
         Set<Transactions> transactionsSet = this.user.getTransactionsSet();
 
         GridPane gridPane = new GridPane();
@@ -76,7 +81,7 @@ public class AppController implements Initializable {
         Separator separator = new Separator();
         separator.setOrientation(Orientation.HORIZONTAL);
 
-        gridPane.add(separator, 0,1,7,1);
+        gridPane.add(separator, 0, 1, 7, 1);
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         DecimalFormat df = new DecimalFormat("#,###.00");
@@ -86,17 +91,17 @@ public class AppController implements Initializable {
             Label description = new Label(transaction.getDescription());
             Label categoryName = new Label(transaction.getTransactionsCategories().getName());
             Label amount = new Label
-                                (String.valueOf(
-                                    df.format(
-                                        transaction.getAmount())));
+                    (String.valueOf(
+                            df.format(
+                                    transaction.getAmount())));
             Label balanceDiff = new Label(
-                                        String.valueOf(
-                                            df2.format(
-                                                transaction.getBalanceDiff())));
+                    String.valueOf(
+                            df2.format(
+                                    transaction.getBalanceDiff())));
             Label date = new Label(
-                                String.valueOf(
-                                    simpleDateFormat.format(
-                                        transaction.getTransactionDate())));
+                    String.valueOf(
+                            simpleDateFormat.format(
+                                    transaction.getTransactionDate())));
             gridPane.add(description, 0, i, 1, 1);
             gridPane.add(categoryName, 1, i, 1, 1);
             gridPane.add(amount, 2, i, 1, 1);
@@ -121,12 +126,11 @@ public class AppController implements Initializable {
 
     public void openAddNewTrxWindow(ActionEvent actionEvent) {
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("addNewTrx.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("fxmlFiles/addNewTrx.fxml"));
         try {
             Parent root = fxmlLoader.load();
             AddNewTrxController addNewTrxController = fxmlLoader.getController();
             addNewTrxController.setUser(this.user);
-
             Stage newTrx = new Stage();
             newTrx.setScene(new Scene(root));
             newTrx.setTitle("Add new transaction");
@@ -135,6 +139,20 @@ public class AppController implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    public void openAddNewCategoryWindow(ActionEvent actionEvent) {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("fxmlFiles/addNewCategory.fxml"));
+        try {
+            Parent root = fxmlLoader.load();
+            Stage newTrx = new Stage();
+            newTrx.setScene(new Scene(root));
+            newTrx.setTitle("Add new category");
+            newTrx.setResizable(false);
+            newTrx.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

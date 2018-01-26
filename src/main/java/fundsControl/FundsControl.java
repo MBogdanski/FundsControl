@@ -15,7 +15,7 @@ public class FundsControl extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("sample.fxml"));
+        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fxmlFiles/login.fxml"));
         primaryStage.setTitle("FundsControl - Sign In");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();

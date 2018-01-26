@@ -2,13 +2,12 @@ package fundsControl.controllers;
 
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
-import fundsControl.models.Transactions;
 import fundsControl.models.User;
 import fundsControl.utils.HibernateUtil;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -18,9 +17,11 @@ import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 
-public class LoginController {
+public class LoginController implements Initializable {
 
     public User user;
 
@@ -33,11 +34,9 @@ public class LoginController {
     @FXML
     public Button register;
 
-    private ObservableList<Transactions> transactionsObservableList;
+    @FXML
+    public Button login;
 
-    public void initialize() {
-
-    }
 
     public void login(ActionEvent actionEvent) {
 
@@ -80,7 +79,7 @@ public class LoginController {
 
 
     public void showMainAppScene() {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("mainApp.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("fxmlFiles/mainApp.fxml"));
         try {
             Parent root = fxmlLoader.load();
             AppController appController = fxmlLoader.getController();
@@ -90,9 +89,16 @@ public class LoginController {
             mainStage.setScene(new Scene(root));
             mainStage.setTitle("FundsControl");
             mainStage.show();
+            Stage stage = (Stage) this.login.getScene().getWindow();
+            stage.close();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+
     }
 }

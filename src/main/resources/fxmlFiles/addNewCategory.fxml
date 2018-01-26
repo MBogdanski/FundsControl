@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane prefHeight="117.0" prefWidth="343.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fundsControl.controllers.AddCategoryController">
+   <children>
+      <JFXTextField fx:id="categoryName" alignment="CENTER" layoutX="33.0" layoutY="43.0" promptText="New category name" />
+      <JFXButton fx:id="addCategoryBtn" buttonType="RAISED" layoutX="223.0" layoutY="46.0" onAction="#addNewCategory" prefHeight="26.0" prefWidth="105.0" text="Add category" />
+   </children>
+</AnchorPane>
