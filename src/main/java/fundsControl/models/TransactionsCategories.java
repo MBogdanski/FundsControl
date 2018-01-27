@@ -14,10 +14,23 @@ public class TransactionsCategories {
     @Column(name = "name")
     private String name;
 
-    @OneToMany(mappedBy = "transactionsCategories")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "transactionsCategories")
     private Set<Transactions> Transactions;
 
-    public TransactionsCategories(String name) {
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private User user;
+
+    public TransactionsCategories(User user, String name) {
+        this.user = user;
         this.name = name;
     }
 

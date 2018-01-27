@@ -15,6 +15,9 @@ public class Transactions {
     @Column(name = "amount")
     private BigDecimal amount;
 
+    @Column(name = "balance_before")
+    private BigDecimal balanceBefore;
+
     @Column(name = "balance_diff")
     private BigDecimal balanceDiff;
 
@@ -25,6 +28,7 @@ public class Transactions {
     private String description;
 
     @Column(name = "date")
+    @Temporal(TemporalType.DATE)
     private Date transactionDate;
 
     @ManyToOne
@@ -35,10 +39,12 @@ public class Transactions {
     @JoinColumn(name = "category_id", nullable = false)
     private TransactionsCategories transactionsCategories;
 
-    public Transactions(User u, TransactionsCategories transactionsCategories, BigDecimal amount, boolean isCredit, String description, Date transactionDate) {
+    public Transactions(User u, TransactionsCategories transactionsCategories, BigDecimal amount, BigDecimal balanceBefore, BigDecimal balanceDiff, boolean isCredit, String description, Date transactionDate) {
         this.user = u;
         this.transactionsCategories = transactionsCategories;
         this.amount = amount;
+        this.balanceBefore = balanceBefore;
+        this.balanceDiff = balanceDiff;
         this.isCredit = isCredit;
         this.description = description;
         this.transactionDate = transactionDate;
@@ -63,6 +69,14 @@ public class Transactions {
         this.amount = amount;
     }
 
+    public BigDecimal getBalanceBefore() {
+        return balanceBefore;
+    }
+
+    public void setBalanceBefore(BigDecimal balanceBefore) {
+        this.balanceBefore = balanceBefore;
+    }
+
     public BigDecimal getBalanceDiff() {
         return balanceDiff;
     }
@@ -78,6 +92,7 @@ public class Transactions {
     public void setCredit(boolean credit) {
         isCredit = credit;
     }
+    
     public String getDescription() {
         return description;
     }
