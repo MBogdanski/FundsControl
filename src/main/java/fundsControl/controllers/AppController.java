@@ -47,13 +47,13 @@ public class AppController implements Initializable {
     @FXML
     public Button loadTrxBtn;
 
-    private User user;
+    public static User user;
 
-    public void loadTrx(ActionEvent actionEvent) {
+    public void loadTrx() {
 
         Session session = HibernateUtil.openSession();
         session.refresh(user);
-        Set<Transactions> transactionsSet = this.user.getTransactionsSet();
+        Set<Transactions> transactionsSet = user.getTransactionsSet();
 
         GridPane gridPane = new GridPane();
         gridPane.setHgap(10);
@@ -117,20 +117,16 @@ public class AppController implements Initializable {
 
 
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
+        user = LoginController.user;
+        loadTrx();
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
 
     public void openAddNewTrxWindow(ActionEvent actionEvent) {
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("fxmlFiles/addNewTrx.fxml"));
         try {
             Parent root = fxmlLoader.load();
-            AddNewTrxController addNewTrxController = fxmlLoader.getController();
-            addNewTrxController.setUser(this.user);
             Stage newTrx = new Stage();
             newTrx.setScene(new Scene(root));
             newTrx.setTitle("Add new transaction");
@@ -155,4 +151,6 @@ public class AppController implements Initializable {
             e.printStackTrace();
         }
     }
+
+
 }

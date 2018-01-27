@@ -23,7 +23,7 @@ import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
 
-    public User user;
+    public static User user;
 
     @FXML
     public JFXTextField emailTextField;
@@ -58,7 +58,7 @@ public class LoginController implements Initializable {
             User user = (User) query.uniqueResult();
             session.close();
             if (user.getEmail().equals(emailApp) && user.getPassword().equals(passwordApp)) {
-                this.user = user;
+                LoginController.user = user;
                 return true;
             }
 
@@ -82,8 +82,8 @@ public class LoginController implements Initializable {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("fxmlFiles/mainApp.fxml"));
         try {
             Parent root = fxmlLoader.load();
-            AppController appController = fxmlLoader.getController();
-            appController.setUser(this.user);
+//            AppController appController = fxmlLoader.getController();
+//            appController.setUser(this.user);
 
             Stage mainStage = new Stage();
             mainStage.setScene(new Scene(root));

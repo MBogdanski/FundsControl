@@ -3,6 +3,7 @@ package fundsControl.controllers;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import fundsControl.models.TransactionsCategories;
+import fundsControl.models.User;
 import fundsControl.utils.HibernateUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -22,15 +23,17 @@ public class AddCategoryController implements Initializable{
     @FXML
     public JFXButton addCategoryBtn;
 
+    private User user;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
+        this.user = AppController.user;
     }
 
     public void addNewCategory(ActionEvent actionEvent) {
         Session session = HibernateUtil.openSession();
         session.getTransaction().begin();
-        TransactionsCategories transactionsCategory = new TransactionsCategories(this.categoryName.getText());
+        TransactionsCategories transactionsCategory = new TransactionsCategories(this.user, this.categoryName.getText());
         session.save(transactionsCategory);
         session.getTransaction().commit();
         session.close();

@@ -10,6 +10,7 @@ import fundsControl.utils.HibernateUtil;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -48,20 +49,17 @@ public class AddNewTrxController implements Initializable {
     @FXML
     public JFXTextField addTrxAmount;
 
-    private List<TransactionsCategories> transactionsCategories;
+    private Set<TransactionsCategories> transactionsCategoriesSet;
 
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        this.user = AppController.user;
         addTrxType.setItems(FXCollections.observableArrayList("Income","Outgoing"));
         addTrxType2.setItems(FXCollections.observableArrayList("Income","Outgoing"));
         addTrxCategory.setItems(FXCollections.observableArrayList(getCategoriesNames()));
-        addTrxCategory2.setItems(FXCollections.observableArrayList(getCategoriesNames()));
 
 
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
 
     public void addNewTrx(ActionEvent actionEvent) {
 
@@ -104,25 +102,18 @@ public class AddNewTrxController implements Initializable {
     }
 
 
-    private List<TransactionsCategories> getTransactionsCategories() {
-        Session session = HibernateUtil.openSession();
-        TypedQuery<TransactionsCategories> typedQuery = session.createQuery("SELECT tc from TransactionsCategories tc", TransactionsCategories.class);
-        List<TransactionsCategories> trxCategories = typedQuery.getResultList();
-        session.close();
-        return trxCategories;
-    }
 
     private List<String> getCategoriesNames() {
-        this.transactionsCategories = getTransactionsCategories();
+        this.transactionsCategoriesSet = this.user.getTransactionsCategoriesSet();
         List<String> categoriesNames = new ArrayList<>();
-        for (TransactionsCategories trxCat : this.transactionsCategories) {
+        for (TransactionsCategories trxCat : this.transactionsCategoriesSet) {
             categoriesNames.add(trxCat.getName());
         }
         return categoriesNames;
     }
 
     private TransactionsCategories getTrxCategoryId(String categoryName) {
-        for (TransactionsCategories trxCat : this.transactionsCategories) {
+        for (TransactionsCategories trxCat : this.transactionsCategoriesSet) {
             if (trxCat.getName().equals(categoryName)){
                 return trxCat;
             }

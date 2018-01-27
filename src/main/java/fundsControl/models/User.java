@@ -31,6 +31,17 @@ public class User {
     @OrderBy
     private Set<Transactions> transactionsSet;
 
+    public Set<TransactionsCategories> getTransactionsCategoriesSet() {
+        return transactionsCategoriesSet;
+    }
+
+    public void setTransactionsCategoriesSet(Set<TransactionsCategories> transactionsCategoriesSet) {
+        this.transactionsCategoriesSet = transactionsCategoriesSet;
+    }
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    private Set<TransactionsCategories> transactionsCategoriesSet;
+
     public User(String email, String password, String name, BigDecimal balance) {
         this.email = email;
         this.password = password;
