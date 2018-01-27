@@ -4,10 +4,10 @@
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.scene.layout.AnchorPane?>
 
-
-<AnchorPane prefHeight="117.0" prefWidth="343.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fundsControl.controllers.AddCategoryController">
+<AnchorPane prefHeight="167.0" prefWidth="362.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fundsControl.controllers.AddCategoryController">
    <children>
-      <JFXTextField fx:id="categoryName" alignment="CENTER" layoutX="33.0" layoutY="43.0" promptText="New category name" />
-      <JFXButton fx:id="addCategoryBtn" buttonType="RAISED" layoutX="223.0" layoutY="46.0" onAction="#addNewCategory" prefHeight="26.0" prefWidth="105.0" text="Add category" />
+      <JFXTextField fx:id="categoryName" alignment="CENTER" layoutX="100.0" layoutY="49.0" promptText="New category name" />
+      <JFXButton fx:id="addCategoryBtn" buttonType="RAISED" layoutX="233.0" layoutY="114.0" onAction="#addNewCategory" prefHeight="26.0" prefWidth="105.0" style="-fx-background-color: #4286f4;" text="Add category" />
+      <JFXButton fx:id="cancelBtn" buttonType="RAISED" layoutX="108.0" layoutY="114.0" onAction="#closeWindow" prefHeight="26.0" prefWidth="105.0" style="-fx-background-color: #4286f4;" text="Cancel" />
    </children>
 </AnchorPane>

@@ -57,5 +57,6 @@
       <JFXDatePicker fx:id="addTrxDate" layoutX="169.0" layoutY="200.0" />
       <JFXComboBox fx:id="addTrxCategory2" layoutX="340.0" layoutY="160.0" />
       <JFXComboBox fx:id="addTrxType2" layoutX="347.0" layoutY="239.0" />
+      <JFXButton fx:id="closeBtn" layoutX="111.0" layoutY="333.0" onAction="#closeWindow" prefHeight="26.0" prefWidth="210.0" style="-fx-background-color: #4286f4;" text="Cancel" />
    </children>
 </AnchorPane>

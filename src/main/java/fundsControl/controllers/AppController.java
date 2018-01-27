@@ -49,6 +49,12 @@ public class AppController implements Initializable {
 
     public static User user;
 
+    @FXML
+    public Label userName;
+
+    @FXML
+    public Label userBalance;
+
     public void loadTrx() {
 
         Session session = HibernateUtil.openSession();
@@ -102,11 +108,15 @@ public class AppController implements Initializable {
                     String.valueOf(
                             simpleDateFormat.format(
                                     transaction.getTransactionDate())));
+
+            Button deleteBtn = new Button("Delete");
+            deleteBtn.setOnAction(actionEvent -> deleteTrx(transaction));
             gridPane.add(description, 0, i, 1, 1);
             gridPane.add(categoryName, 1, i, 1, 1);
             gridPane.add(amount, 2, i, 1, 1);
             gridPane.add(balanceDiff, 3, i, 1, 1);
             gridPane.add(date, 4, i, 1, 1);
+            gridPane.add(deleteBtn, 5, i, 1, 1);
             ++i;
         }
         vbox.getChildren().addAll(gridPane);
@@ -118,9 +128,14 @@ public class AppController implements Initializable {
 
     public void initialize(URL url, ResourceBundle resourceBundle) {
         user = LoginController.user;
+        setUserData();
         loadTrx();
     }
 
+    public void setUserData() {
+        this.userName.setText("Hello " + user.getName() + "!");
+        this.userBalance.setText("Your current balance is " + user.getBalance());
+    }
 
     public void openAddNewTrxWindow(ActionEvent actionEvent) {
 
@@ -145,6 +160,7 @@ public class AppController implements Initializable {
             newTrx.setScene(new Scene(root));
             newTrx.setTitle("Add new category");
             newTrx.setResizable(false);
+            newTrx.setOnHiding(windowEvent -> refreshData());
             newTrx.show();
 
         } catch (IOException e) {
@@ -152,5 +168,26 @@ public class AppController implements Initializable {
         }
     }
 
+    public void deleteTrx(Transactions transaction) {
+//        Session session = HibernateUtil.openSession();
+//        session.getTransaction().begin();
+//
+//        session.delete(transaction);
+//        session.refresh(user);
+//        session.close();
 
+
+        for (Transactions trx: user.getTransactionsSet()) {
+            if (trx.getId() > transaction.getId()) {
+                System.out.println("TRX ID: " + trx.getId());
+                System.out.println("TRX DESCRIPTION: " + trx.getDescription());
+            }
+        }
+
+    }
+
+    public void refreshData() {
+        setUserData();
+        loadTrx();
+    }
 }

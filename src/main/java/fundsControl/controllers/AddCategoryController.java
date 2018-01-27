@@ -23,6 +23,9 @@ public class AddCategoryController implements Initializable{
     @FXML
     public JFXButton addCategoryBtn;
 
+    @FXML
+    public JFXButton cancelBtn;
+
     private User user;
 
     @Override
@@ -36,7 +39,13 @@ public class AddCategoryController implements Initializable{
         TransactionsCategories transactionsCategory = new TransactionsCategories(this.user, this.categoryName.getText());
         session.save(transactionsCategory);
         session.getTransaction().commit();
+        session.refresh(user);
+        session.refresh(AppController.user);
         session.close();
-        ((Stage)(((Button)actionEvent.getSource()).getScene().getWindow())).close();
+        ((Button)actionEvent.getSource()).getScene().getWindow().hide();
+    }
+
+    public void closeWindow(ActionEvent actionEvent) {
+        ((Button)actionEvent.getSource()).getScene().getWindow().hide();
     }
 }

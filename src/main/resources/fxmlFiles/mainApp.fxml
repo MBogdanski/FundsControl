@@ -6,7 +6,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane fx:id="mainAnchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="617.0" prefWidth="930.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fundsControl.controllers.AppController">
+<AnchorPane fx:id="mainAnchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="753.0" prefWidth="1202.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fundsControl.controllers.AppController">
    <children>
       <ScrollPane fx:id="scrollPane" layoutX="201.0" layoutY="167.0" prefHeight="386.0" prefWidth="695.0">
         <content>
@@ -16,13 +16,15 @@
             </AnchorPane>
         </content>
       </ScrollPane>
-      <Button fx:id="loadTrxBtn" layoutX="260.0" layoutY="48.0" mnemonicParsing="false" onAction="#loadTrx" prefHeight="44.0" prefWidth="165.0" text="Load Trx" />
+      <Button fx:id="loadTrxBtn" layoutX="960.0" layoutY="303.0" mnemonicParsing="false" onAction="#loadTrx" prefHeight="44.0" prefWidth="165.0" text="Load Trx" />
       <Label layoutX="227.0" layoutY="138.0" text="Description" />
       <Label layoutX="371.0" layoutY="136.0" text="Category" />
       <Label layoutX="517.0" layoutY="139.0" text="Kwota" />
       <Label layoutX="659.0" layoutY="139.0" text="Balance after trx" />
       <Label layoutX="828.0" layoutY="140.0" text="Date" />
-      <JFXButton fx:id="addTrx" alignment="CENTER" buttonType="RAISED" layoutX="431.0" layoutY="48.0" onAction="#openAddNewTrxWindow" prefHeight="44.0" prefWidth="182.0" style="-fx-background-color: #4286f4;" text="Add new transaction" textAlignment="CENTER" />
-      <JFXButton fx:id="addCategoryBtn" alignment="CENTER" buttonType="RAISED" layoutX="634.0" layoutY="48.0" onAction="#openAddNewCategoryWindow" prefHeight="44.0" prefWidth="182.0" ripplerFill="#0c2b0e" style="-fx-background-color: #4286f4;" text="Add new category" textAlignment="CENTER" />
+      <JFXButton fx:id="addTrx" alignment="CENTER" buttonType="RAISED" layoutX="959.0" layoutY="238.0" onAction="#openAddNewTrxWindow" prefHeight="44.0" prefWidth="182.0" style="-fx-background-color: #4286f4;" text="Add new transaction" textAlignment="CENTER" />
+      <JFXButton fx:id="addCategoryBtn" alignment="CENTER" buttonType="RAISED" layoutX="958.0" layoutY="174.0" onAction="#openAddNewCategoryWindow" prefHeight="44.0" prefWidth="182.0" ripplerFill="#0c2b0e" style="-fx-background-color: #4286f4;" text="Add new category" textAlignment="CENTER" />
+      <Label fx:id="userName" alignment="CENTER" layoutX="28.0" layoutY="33.0" prefHeight="71.0" prefWidth="203.0" text="Label" />
+      <Label fx:id="userBalance" layoutX="563.0" layoutY="68.0" prefHeight="44.0" prefWidth="335.0" text="Label" />
    </children>
 </AnchorPane>

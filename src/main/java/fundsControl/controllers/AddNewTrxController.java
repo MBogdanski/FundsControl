@@ -1,5 +1,6 @@
 package fundsControl.controllers;
 
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXTextField;
@@ -7,6 +8,7 @@ import fundsControl.models.Transactions;
 import fundsControl.models.TransactionsCategories;
 import fundsControl.models.User;
 import fundsControl.utils.HibernateUtil;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -31,6 +33,9 @@ public class AddNewTrxController implements Initializable {
 
     @FXML
     public JFXComboBox addTrxType2;
+
+    @FXML
+    public JFXButton closeBtn;
 
     private User user;
 
@@ -92,8 +97,9 @@ public class AddNewTrxController implements Initializable {
             session.save(transaction);
 
             session.getTransaction().commit();
+            session.refresh(AppController.user);
             session.close();
-            ((Stage)(((Button)actionEvent.getSource()).getScene().getWindow())).close();
+            ((Button)actionEvent.getSource()).getScene().getWindow().hide();
         }
     }
 
@@ -146,5 +152,9 @@ public class AddNewTrxController implements Initializable {
             newBalance = oldBalance.subtract(amount);
         }
         return newBalance;
+    }
+
+    public void closeWindow(ActionEvent actionEvent) {
+        ((Button)actionEvent.getSource()).getScene().getWindow().hide();
     }
 }
