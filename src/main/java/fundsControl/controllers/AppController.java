@@ -1,6 +1,8 @@
 package fundsControl.controllers;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDatePicker;
+import com.jfoenix.controls.JFXTextField;
 import fundsControl.models.Transactions;
 import fundsControl.models.User;
 import fundsControl.utils.HibernateUtil;
@@ -49,6 +51,7 @@ public class AppController implements Initializable {
     @FXML
     public Label userBalance;
 
+    public static Transactions editTransaction;
     public void loadTrx() {
 
         Session session = HibernateUtil.openSession();
@@ -105,18 +108,36 @@ public class AppController implements Initializable {
 
             Button deleteBtn = new Button("Delete");
             deleteBtn.setOnAction(actionEvent -> deleteTrx(transaction, getTransactionsToCalculateBalance(transaction, user.getTransactionsSet())));
+            Button editBtn = new Button("Edit");
+            editBtn.setOnAction(actionEvent -> openEditTrxWindow(transaction));
             gridPane.add(description, 0, i, 1, 1);
             gridPane.add(categoryName, 1, i, 1, 1);
             gridPane.add(amount, 2, i, 1, 1);
             gridPane.add(balanceDiff, 3, i, 1, 1);
             gridPane.add(date, 4, i, 1, 1);
-            gridPane.add(deleteBtn, 5, i, 1, 1);
+            gridPane.add(editBtn, 5, i, 1, 1);
+            gridPane.add(deleteBtn, 6, i, 1, 1);
             ++i;
         }
         vbox.getChildren().addAll(gridPane);
 
         scrollPane.setContent(vbox);
         session.close();
+    }
+
+    private void openEditTrxWindow(Transactions transaction) {
+        editTransaction = transaction;
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("fxmlFiles/editTrx.fxml"));
+        try {
+            Parent root = fxmlLoader.load();
+            Stage newTrx = new Stage();
+            newTrx.setScene(new Scene(root));
+            newTrx.setTitle("Edit transaction");
+            newTrx.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -185,6 +206,7 @@ public class AppController implements Initializable {
         List<Transactions> trxList;
         trxList = sortTrxList(newlyCalculatedTrxSet);
         BigDecimal balanceBefore = transaction.getBalanceBefore();
+        BigDecimal userBalance = null;
         for (Transactions trx : trxList) {
             trx.setBalanceBefore(balanceBefore);
             if (trx.isCredit()) {
@@ -193,8 +215,11 @@ public class AppController implements Initializable {
                 trx.setBalanceDiff(trx.getBalanceBefore().subtract(trx.getAmount()));
             }
             balanceBefore = trx.getBalanceDiff();
+            userBalance = trx.getBalanceDiff();
             session.update(trx);
         }
+        user.setBalance(userBalance);
+        session.update(user);
         session.delete(transaction);
         session.getTransaction().commit();
         session.refresh(user);
@@ -205,5 +230,8 @@ public class AppController implements Initializable {
     public void refreshData() {
         setUserData();
         loadTrx();
+    }
+
+    public void editTrx(ActionEvent actionEvent) {
     }
 }
