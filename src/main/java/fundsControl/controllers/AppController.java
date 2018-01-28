@@ -24,31 +24,25 @@ import javafx.stage.Stage;
 import org.hibernate.Session;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 public class AppController implements Initializable {
 
+    public static User user;
     @FXML
     public ScrollPane scrollPane;
-
     @FXML
     public AnchorPane mainAnchor;
-
     @FXML
     public JFXButton addTrx;
-
     @FXML
     public JFXButton addCategoryBtn;
-
     @FXML
     public Button loadTrxBtn;
-
-    public static User user;
-
     @FXML
     public Label userName;
 
@@ -110,7 +104,7 @@ public class AppController implements Initializable {
                                     transaction.getTransactionDate())));
 
             Button deleteBtn = new Button("Delete");
-            deleteBtn.setOnAction(actionEvent -> deleteTrx(transaction));
+            deleteBtn.setOnAction(actionEvent -> deleteTrx(transaction, getTransactionsToCalculateBalance(transaction, user.getTransactionsSet())));
             gridPane.add(description, 0, i, 1, 1);
             gridPane.add(categoryName, 1, i, 1, 1);
             gridPane.add(amount, 2, i, 1, 1);
@@ -161,6 +155,7 @@ public class AppController implements Initializable {
             newTrx.setTitle("Add new category");
             newTrx.setResizable(false);
             newTrx.setOnHiding(windowEvent -> refreshData());
+            newTrx.setOnHidden(windowEvent -> refreshData());
             newTrx.show();
 
         } catch (IOException e) {
@@ -168,22 +163,43 @@ public class AppController implements Initializable {
         }
     }
 
-    public void deleteTrx(Transactions transaction) {
-//        Session session = HibernateUtil.openSession();
-//        session.getTransaction().begin();
-//
-//        session.delete(transaction);
-//        session.refresh(user);
-//        session.close();
-
-
-        for (Transactions trx: user.getTransactionsSet()) {
+    public Set<Transactions> getTransactionsToCalculateBalance(Transactions transaction, Set<Transactions> transactionsSet) {
+        Set<Transactions> newlyCalculatedTrxSet = new HashSet<>();
+        for (Transactions trx : transactionsSet) {
             if (trx.getId() > transaction.getId()) {
-                System.out.println("TRX ID: " + trx.getId());
-                System.out.println("TRX DESCRIPTION: " + trx.getDescription());
+                newlyCalculatedTrxSet.add(trx);
             }
         }
+        return newlyCalculatedTrxSet;
+    }
 
+    public List<Transactions> sortTrxList(Set<Transactions> transactionsSet) {
+        List<Transactions> trxList = new ArrayList<>(transactionsSet);
+        trxList.sort(Comparator.comparing(Transactions::getId));
+        return trxList;
+    }
+
+    public void deleteTrx(Transactions transaction, Set<Transactions> newlyCalculatedTrxSet) {
+        Session session = HibernateUtil.openSession();
+        session.getTransaction().begin();
+        List<Transactions> trxList;
+        trxList = sortTrxList(newlyCalculatedTrxSet);
+        BigDecimal balanceBefore = transaction.getBalanceBefore();
+        for (Transactions trx : trxList) {
+            trx.setBalanceBefore(balanceBefore);
+            if (trx.isCredit()) {
+                trx.setBalanceDiff(trx.getBalanceBefore().add(trx.getAmount()));
+            } else {
+                trx.setBalanceDiff(trx.getBalanceBefore().subtract(trx.getAmount()));
+            }
+            balanceBefore = trx.getBalanceDiff();
+            session.update(trx);
+        }
+        session.delete(transaction);
+        session.getTransaction().commit();
+        session.refresh(user);
+        session.close();
+        refreshData();
     }
 
     public void refreshData() {
