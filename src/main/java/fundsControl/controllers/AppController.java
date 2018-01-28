@@ -231,7 +231,4 @@ public class AppController implements Initializable {
         setUserData();
         loadTrx();
     }
-
-    public void editTrx(ActionEvent actionEvent) {
-    }
 }

@@ -68,6 +68,19 @@ public class LoginController implements Initializable {
     }
 
     public void register(ActionEvent actionEvent) {
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("fxmlFiles/register.fxml"));
+        try {
+            Parent root = fxmlLoader.load();
+            Stage mainStage = new Stage();
+            mainStage.setScene(new Scene(root));
+            mainStage.setTitle("FundsControl - Sign Up");
+            mainStage.show();
+            Stage stage = (Stage) this.login.getScene().getWindow();
+            stage.hide();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -82,9 +95,6 @@ public class LoginController implements Initializable {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("fxmlFiles/mainApp.fxml"));
         try {
             Parent root = fxmlLoader.load();
-//            AppController appController = fxmlLoader.getController();
-//            appController.setUser(this.user);
-
             Stage mainStage = new Stage();
             mainStage.setScene(new Scene(root));
             mainStage.setTitle("FundsControl");
