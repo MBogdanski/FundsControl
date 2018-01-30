@@ -8,14 +8,17 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import fundsControl.models.User;
 import fundsControl.utils.HibernateUtil;
-import fundsControl.validators.InputsValidator;
+import fundsControl.validators.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+import org.controlsfx.control.Notifications;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
@@ -38,15 +41,20 @@ public class RegisterController implements Initializable {
     @FXML
     public JFXButton cancelBtn;
 
+    public static boolean isEmailFieldValid = false;
+    public static boolean isPasswordFieldValid = false;
+    public static boolean isConfirmPasswordFieldValid = false;
+    public static boolean isUsernameFieldValid = false;
+
     private InputsValidator inputsValidator;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         inputsValidator = new InputsValidator();
-
+        signUpBtn.setDisable(true);
         setEmailFieldValidators(emailField);
         setPasswordFieldValidators(passwordField);
-        setConfPasswordFieldValidator(confPasswordField);
+        setConfPasswordFieldValidators(confPasswordField);
         setUsernameFieldValidator(usernameField);
     }
 
@@ -57,7 +65,7 @@ public class RegisterController implements Initializable {
         String name = usernameField.getText();
 
         if (validateInputs(email, password, confirmPassword, name)) {
-            if (checkUserExist(emailField.getText())) {
+            if (!checkUserExist(emailField.getText())) {
                 User user = new User(email, password, name, new BigDecimal("0.00"));
                 Session session = HibernateUtil.openSession();
                 session.getTransaction().begin();
@@ -65,6 +73,8 @@ public class RegisterController implements Initializable {
                 session.getTransaction().commit();
                 session.close();
                 openLoginWindow();
+            } else {
+                showErrorNotification();
             }
         }
 
@@ -121,18 +131,21 @@ public class RegisterController implements Initializable {
 
     private void setEmailFieldValidators(JFXTextField textField) {
         setRequiredFieldValidation(textField);
+        setEmailFieldValidator(textField);
     }
 
     private void setPasswordFieldValidators(JFXPasswordField passwordField) {
         setRequiredFieldValidation(passwordField);
+        setPasswordFieldValidator(passwordField);
     }
 
-    private void setConfPasswordFieldValidator(JFXPasswordField passwordField) {
+    private void setConfPasswordFieldValidators(JFXPasswordField passwordField) {
         setRequiredFieldValidation(passwordField);
+        setConfPasswordFieldValidator(passwordField, passwordField.getText());
     }
 
-    private void setUsernameFieldValidator(JFXTextField textField) {
-        setRequiredFieldValidation(textField);
+    private void setUsernameFieldValidators(JFXTextField textField) {
+
     }
 
     private void setRequiredFieldValidation(JFXPasswordField passwordField) {
@@ -140,6 +153,7 @@ public class RegisterController implements Initializable {
         passwordField.focusedProperty().addListener((observableValue, oldValue, newValue) -> {
             if (!newValue) {
                 passwordField.validate();
+                enableSignUpButton();
             }
         });
     }
@@ -149,30 +163,102 @@ public class RegisterController implements Initializable {
         textField.getValidators().add(requiredFieldValidator[0]);
         textField.focusedProperty().addListener((observableValue, oldValue, newValue) -> {
             if (!newValue) {
-                if (textField.validate()) {
-                    System.out.println("validate work");
-                    if (validateEmail(textField.getText())) {
-                        System.out.println("work");
-                    } else {
-                        System.out.println("nie work");
-                        requiredFieldValidator[0] = getRequiredFieldValidator();
-
-                        textField.getValidators().add(requiredFieldValidator[0]);
-                        textField.focusedProperty().addListener((observableValue2, oldValue2, newValue2) -> {
-                            textField.getActiveValidator().setMessage("Wrong email format");
-                        });
-                    }
-                }
+                textField.validate();
+                enableSignUpButton();
             }
         });
+    }
+
+    private void setEmailFieldValidator(JFXTextField textField) {
+        EmailFieldValidator emailFieldValidator = new EmailFieldValidator();
+        emailFieldValidator.setMessage("Wrong email format");
+
+
+        emailFieldValidator.setIcon(getErrorIcon());
+        textField.getValidators().add(emailFieldValidator);
+
+        textField.focusedProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (!newValue) {
+                textField.validate();
+                enableSignUpButton();
+            }
+        });
+    }
+
+    private void setPasswordFieldValidator(JFXPasswordField passwordField) {
+        PasswordFieldValidator passwordFieldValidator = new PasswordFieldValidator();
+        passwordFieldValidator.setMessage("Password is too weak");
+
+
+        passwordFieldValidator.setIcon(getErrorIcon());
+        passwordField.getValidators().add(passwordFieldValidator);
+        passwordField.focusedProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (!newValue) {
+                passwordField.validate();
+                enableSignUpButton();
+            }
+        });
+    }
+
+    private void setConfPasswordFieldValidator(JFXPasswordField confPasswordField, String passwordFieldText) {
+        ConfirmPasswordFieldValidator confirmPasswordFieldValidator = new ConfirmPasswordFieldValidator(passwordFieldText);
+        confirmPasswordFieldValidator.setMessage("Password must be equals");
+
+        confirmPasswordFieldValidator.setIcon(getErrorIcon());
+        confPasswordField.getValidators().add(confirmPasswordFieldValidator);
+        confPasswordField.focusedProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (!newValue) {
+                confirmPasswordFieldValidator.setPasswordText(passwordField.getText());
+                confPasswordField.validate();
+                enableSignUpButton();
+            }
+        });
+    }
+
+    private void setUsernameFieldValidator(JFXTextField textField) {
+        UsernameFieldValidator usernameFieldValidator = new UsernameFieldValidator();
+        usernameFieldValidator.setMessage("Field can't be empty");
+
+        usernameFieldValidator.setIcon(getErrorIcon());
+        textField.getValidators().add(usernameFieldValidator);
+        textField.focusedProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (!newValue) {
+                textField.validate();
+                enableSignUpButton();
+            }
+        });
+        textField.setOnKeyTyped(keyEvent -> textField.validate());
     }
 
     private RequiredFieldValidator getRequiredFieldValidator() {
         RequiredFieldValidator requiredFieldValidator = new RequiredFieldValidator();
         requiredFieldValidator.setMessage("Field can't be empty");
+
+        requiredFieldValidator.setIcon(getErrorIcon());
+        return requiredFieldValidator;
+    }
+
+    private FontAwesomeIconView getErrorIcon() {
         FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.CLOSE);
         icon.setStyle("-fx-background-color: red");
-        requiredFieldValidator.setIcon(icon);
-        return requiredFieldValidator;
+        return icon;
+    }
+
+    private void enableSignUpButton() {
+        if (isEmailFieldValid && isPasswordFieldValid && isConfirmPasswordFieldValid && isUsernameFieldValid) {
+            signUpBtn.setDisable(false);
+        } else {
+            signUpBtn.setDisable(true);
+        }
+    }
+
+    private void showErrorNotification() {
+        Notifications notificationsBuilder = Notifications.create()
+                .title("User already exists")
+                .text("User with provided email already exists")
+                .graphic(getErrorIcon())
+                .hideAfter(Duration.seconds(5))
+                .position(Pos.CENTER);
+        notificationsBuilder.showError();
     }
 }

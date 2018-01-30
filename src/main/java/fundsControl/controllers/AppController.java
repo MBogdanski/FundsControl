@@ -1,11 +1,11 @@
 package fundsControl.controllers;
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXDatePicker;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
 import fundsControl.models.Transactions;
+import fundsControl.models.TransactionsCategories;
 import fundsControl.models.User;
 import fundsControl.utils.HibernateUtil;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -35,6 +35,7 @@ import java.util.*;
 public class AppController implements Initializable {
 
     public static User user;
+    public static Transactions editTransaction;
     @FXML
     public ScrollPane scrollPane;
     @FXML
@@ -47,11 +48,25 @@ public class AppController implements Initializable {
     public Button loadTrxBtn;
     @FXML
     public Label userName;
-
     @FXML
     public Label userBalance;
+    @FXML
+    public JFXComboBox categoriesFilterComboBox;
+    @FXML
+    public JFXToggleButton applyAmountFilter;
+    @FXML
+    public JFXTextField filterFromAmountField;
+    @FXML
+    public JFXDatePicker filterDate;
+    @FXML
+    public JFXToggleButton applyCategoryFilter;
+    @FXML
+    public JFXToggleButton applyDateFilter;
+    @FXML
+    public JFXTextField filterToAmountField;
 
-    public static Transactions editTransaction;
+    private Set<TransactionsCategories> transactionsCategoriesSet;
+
     public void loadTrx() {
 
         Session session = HibernateUtil.openSession();
@@ -145,6 +160,7 @@ public class AppController implements Initializable {
         user = LoginController.user;
         setUserData();
         loadTrx();
+        categoriesFilterComboBox.setItems(FXCollections.observableArrayList(getCategoriesNames()));
     }
 
     public void setUserData() {
@@ -230,5 +246,27 @@ public class AppController implements Initializable {
     public void refreshData() {
         setUserData();
         loadTrx();
+    }
+
+    private List<String> getCategoriesNames() {
+        this.transactionsCategoriesSet = user.getTransactionsCategoriesSet();
+        List<String> categoriesNames = new ArrayList<>();
+        for (TransactionsCategories trxCat : this.transactionsCategoriesSet) {
+            categoriesNames.add(trxCat.getName());
+        }
+        return categoriesNames;
+    }
+
+    private TransactionsCategories getTrxCategoryId(String categoryName) {
+        for (TransactionsCategories trxCat : this.transactionsCategoriesSet) {
+            if (trxCat.getName().equals(categoryName)) {
+                return trxCat;
+            }
+        }
+        return null;
+    }
+
+    public void applyFilters() {
+
     }
 }
