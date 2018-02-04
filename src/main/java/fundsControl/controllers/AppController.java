@@ -24,7 +24,6 @@ import javafx.scene.control.Separator;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -36,6 +35,8 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 public class AppController implements Initializable {
@@ -57,27 +58,39 @@ public class AppController implements Initializable {
     @FXML
     public Label userBalance;
     @FXML
-    public JFXComboBox categoriesFilterComboBox;
-    @FXML
     public JFXToggleButton applyAmountFilter;
-    @FXML
-    public JFXTextField filterFromAmountField;
-    @FXML
-    public JFXDatePicker filterDate;
     @FXML
     public JFXToggleButton applyCategoryFilter;
     @FXML
     public JFXToggleButton applyDateFilter;
     @FXML
+    public JFXComboBox categoriesFilterComboBox;
+    @FXML
+    public JFXTextField filterFromAmountField;
+    @FXML
     public JFXTextField filterToAmountField;
+    @FXML
+    public JFXDatePicker filterToDate;
+    @FXML
+    public JFXDatePicker filterFromDate;
 
-    private Set<TransactionsCategories> transactionsCategoriesSet;
+    private boolean isAmountFilterOn = false;
+    private boolean isCategoryFilterOn = false;
+    private boolean isDateFilterOn = false;
 
-    public void loadTrx() {
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        user = LoginController.user;
+        loadTrx(user.getTransactionsSet());
+        this.loadTrxBtn.setOnAction(actionEvent -> loadTrx(user.getTransactionsSet()));
+        setUserData();
+        categoriesFilterComboBox.setItems(FXCollections.observableArrayList(getCategoriesNames()));
+        applyFilters();
+    }
+
+    public void loadTrx(Set<Transactions> transactionsSet) {
 
         Session session = HibernateUtil.openSession();
         session.refresh(user);
-        Set<Transactions> transactionsSet = user.getTransactionsSet();
 
         GridPane gridPane = new GridPane();
         gridPane.setHgap(10);
@@ -101,12 +114,6 @@ public class AppController implements Initializable {
         trxDate.setMinWidth(100);
         trxDate.setTextAlignment(TextAlignment.CENTER);
 
-
-//        trxDescription.setFont(new Font("Arial", 15));
-//        trxCategoryName.setFont(new Font("Arial", 15));
-//        trxAmount.setFont(new Font("Arial", 15));
-//        trxBalance.setFont(new Font("Arial", 15));
-//        trxDate.setFont(new Font("Arial", 15));
         gridPane.add(trxDescription, 0, 0);
         gridPane.add(trxCategoryName, 1, 0);
         gridPane.add(trxAmount, 2, 0);
@@ -131,7 +138,7 @@ public class AppController implements Initializable {
                     (String.valueOf(
                             df.format(
                                     transaction.getAmount())));
-            if (transaction.isCredit()){
+            if (transaction.isCredit()) {
                 amount.setStyle("-fx-text-fill: green");
             } else {
                 amount.setStyle("-fx-text-fill: red");
@@ -185,14 +192,6 @@ public class AppController implements Initializable {
         }
     }
 
-
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        user = LoginController.user;
-        loadTrx();
-        setUserData();
-        categoriesFilterComboBox.setItems(FXCollections.observableArrayList(getCategoriesNames()));
-    }
-
     public void setUserData() {
         this.userName.setText("Hello " + user.getName() + "!");
         DecimalFormat df = new DecimalFormat("0,000.00");
@@ -237,7 +236,7 @@ public class AppController implements Initializable {
         }
     }
 
-     Set<Transactions> getTransactionsToCalculateBalance(Transactions transaction, Set<Transactions> transactionsSet) {
+    Set<Transactions> getTransactionsToCalculateBalance(Transactions transaction, Set<Transactions> transactionsSet) {
         Set<Transactions> newlyCalculatedTrxSet = new HashSet<>();
         for (Transactions trx : transactionsSet) {
             if (trx.getId() > transaction.getId()) {
@@ -247,13 +246,13 @@ public class AppController implements Initializable {
         return newlyCalculatedTrxSet;
     }
 
-     private List<Transactions> sortTrxList(Set<Transactions> transactionsSet) {
+    private List<Transactions> sortTrxList(Set<Transactions> transactionsSet) {
         List<Transactions> trxList = new ArrayList<>(transactionsSet);
         trxList.sort(Comparator.comparing(Transactions::getId));
         return trxList;
     }
 
-     void deleteTrx(Transactions transaction, Set<Transactions> newlyCalculatedTrxSet) {
+    void deleteTrx(Transactions transaction, Set<Transactions> newlyCalculatedTrxSet) {
         Session session = HibernateUtil.openSession();
         session.getTransaction().begin();
         List<Transactions> trxList;
@@ -280,22 +279,18 @@ public class AppController implements Initializable {
         refreshData();
     }
 
-     private void refreshData() {
+    private void refreshData() {
         setUserData();
-        loadTrx();
+        loadTrx(user.getTransactionsSet());
     }
 
     private List<String> getCategoriesNames() {
-        this.transactionsCategoriesSet = user.getTransactionsCategoriesSet();
+        Set<TransactionsCategories> transactionsCategoriesSet = user.getTransactionsCategoriesSet();
         List<String> categoriesNames = new ArrayList<>();
-        for (TransactionsCategories trxCat : this.transactionsCategoriesSet) {
+        for (TransactionsCategories trxCat : transactionsCategoriesSet) {
             categoriesNames.add(trxCat.getName());
         }
         return categoriesNames;
-    }
-
-    public void applyFilters() {
-
     }
 
     private void showErrorNotification(String text) {
@@ -307,9 +302,153 @@ public class AppController implements Initializable {
                 .position(Pos.CENTER);
         notificationsBuilder.showError();
     }
+
     private FontAwesomeIconView getErrorIcon() {
         FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.CLOSE);
         icon.setStyle("-fx-background-color: red");
         return icon;
+    }
+
+
+    private void applyFilters() {
+        applyCategoryFilter.selectedProperty().addListener((observableValue, toggle, newToggle) -> {
+            isCategoryFilterOn = applyCategoryFilter.isSelected();
+            loadTrx(getFilteredTrxSet(user.getTransactionsSet()));
+        });
+
+        applyDateFilter.selectedProperty().addListener((observableValue, toggle, newToggle) -> {
+            isDateFilterOn = applyDateFilter.isSelected();
+            loadTrx(getFilteredTrxSet(user.getTransactionsSet()));
+        });
+
+        applyAmountFilter.selectedProperty().addListener((observableValue, toggle, newToggle) -> {
+            isAmountFilterOn = applyAmountFilter.isSelected();
+            loadTrx(getFilteredTrxSet(user.getTransactionsSet()));
+        });
+    }
+
+    private Set<Transactions> getFilteredTrxSet(Set<Transactions> transactionsSet){
+        Set<Transactions> trxRemovingList = new HashSet<>();
+        String categoryName = categoriesFilterComboBox.getSelectionModel().getSelectedItem().toString();
+        if (isCategoryFilterOn) {
+            for (Transactions trx : transactionsSet) {
+                if (!trx.getTransactionsCategories().getName().equals(categoryName)){
+                    trxRemovingList.add(trx);
+                }
+            }
+            transactionsSet.removeAll(trxRemovingList);
+        }
+
+        if (isDateFilterOn) {
+            transactionsSet = filterTrxSetByDates(transactionsSet);
+        }
+
+        if (isAmountFilterOn) {
+            transactionsSet = filterTrxSetByAmounts(transactionsSet);
+        }
+
+        return transactionsSet;
+    }
+
+    private Set<Transactions> filterTrxSetByAmounts(Set<Transactions> transactionsSet) {
+        BigDecimal fromAmount = getAmountFrom();
+        BigDecimal toAmount = getToAmount();
+        Set<Transactions> trxRemovingList = new HashSet<>();
+
+        if (fromAmount != null && toAmount != null){
+            for (Transactions trx : transactionsSet) {
+                if (trx.getAmount().compareTo(fromAmount) == -1 && trx.getAmount().compareTo(toAmount) == 1) {
+                    trxRemovingList.add(trx);
+                }
+            }
+            transactionsSet.removeAll(trxRemovingList);
+            return transactionsSet;
+        }
+
+        if (fromAmount != null) {
+            for (Transactions trx : transactionsSet) {
+                if (trx.getAmount().compareTo(fromAmount) == -1) {
+                    trxRemovingList.add(trx);
+                }
+            }
+            transactionsSet.removeAll(trxRemovingList);
+            return transactionsSet;
+        }
+
+        if (toAmount != null) {
+            for (Transactions trx : transactionsSet) {
+                if (trx.getAmount().compareTo(toAmount) == 1) {
+                    trxRemovingList.add(trx);
+                }
+            }
+            transactionsSet.removeAll(trxRemovingList);
+            return transactionsSet;
+        }
+
+        return transactionsSet;
+    }
+
+    private BigDecimal getAmountFrom(){
+        if (!this.filterFromAmountField.getText().isEmpty()){
+            try {
+                BigDecimal fromAmount = new BigDecimal(this.filterFromAmountField.getText());
+                return fromAmount;
+            } catch (NumberFormatException e){
+                e.getMessage();
+                showErrorNotification("Wrong From Amount format");
+            }
+        }
+        return null;
+    }
+
+    private BigDecimal getToAmount() {
+        if (!this.filterToAmountField.getText().isEmpty()){
+            try {
+                BigDecimal toAmount = new BigDecimal(this.filterToAmountField.getText());
+                return toAmount;
+            } catch (NumberFormatException e){
+                e.getMessage();
+                showErrorNotification("Wrong To Amount format");
+            }
+        }
+        return null;
+    }
+
+    private Set<Transactions> filterTrxSetByDates(Set<Transactions> transactionsSet) {
+        LocalDate fromDate = filterFromDate.getValue();
+        LocalDate toDate = filterToDate.getValue();
+        Set<Transactions> trxRemovingList = new HashSet<>();
+
+        if (fromDate != null && toDate != null) {
+            for (Transactions trx : transactionsSet) {
+                if (!trx.getTransactionDate().before(Date.from(fromDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()))
+                        && !trx.getTransactionDate().after(Date.from(toDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()))){
+                    trxRemovingList.add(trx);
+                }
+            }
+            transactionsSet.removeAll(trxRemovingList);
+            return transactionsSet;
+        }
+
+        if (fromDate != null) {
+            for (Transactions trx : transactionsSet) {
+                if (!trx.getTransactionDate().before(Date.from(fromDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()))){
+                    trxRemovingList.add(trx);
+                }
+            }
+            transactionsSet.removeAll(trxRemovingList);
+            return transactionsSet;
+        }
+
+        if (toDate != null) {
+            for (Transactions trx : transactionsSet) {
+                if (!trx.getTransactionDate().after(Date.from(toDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()))){
+                    trxRemovingList.add(trx);
+                }
+            }
+            transactionsSet.removeAll(trxRemovingList);
+            return transactionsSet;
+        }
+        return transactionsSet;
     }
 }

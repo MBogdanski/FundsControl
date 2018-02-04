@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 public class EditTrxController implements Initializable {
@@ -71,6 +72,9 @@ public class EditTrxController implements Initializable {
         if (validateInputs()) {
             Session session = HibernateUtil.openSession();
             session.getTransaction().begin();
+            LocalDate newDate = this.editTrxDate.getValue();
+            transaction.setTransactionDate(Date.from(newDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+            transaction.setDescription(this.editTrxDesc.getText());
             BigDecimal newAmount = new BigDecimal(this.editTrxAmount.getText());
             transaction.setAmount(newAmount);
             if (transaction.isCredit()) {
@@ -187,7 +191,7 @@ public class EditTrxController implements Initializable {
                 .graphic(getSuccessIcon())
                 .hideAfter(Duration.seconds(5))
                 .position(Pos.BOTTOM_RIGHT);
-        notificationsBuilder.showError();
+        notificationsBuilder.showConfirm();
     }
     private FontAwesomeIconView getSuccessIcon() {
         FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.CHECK);

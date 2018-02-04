@@ -10,7 +10,11 @@ import fundsControl.utils.HibernateUtil;
 import fundsControl.validators.EmailFieldValidator;
 import fundsControl.validators.EmptyPasswordValidator;
 import fundsControl.validators.LoginEmailFieldValidator;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -26,6 +30,7 @@ import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -143,7 +148,7 @@ public class LoginController implements Initializable {
                 .graphic(getSuccessIcon())
                 .hideAfter(Duration.seconds(5))
                 .position(Pos.BOTTOM_RIGHT);
-        notificationsBuilder.showConfirm();
+        notificationsBuilder.show();
     }
 
     private FontAwesomeIconView getErrorIcon() {
@@ -176,6 +181,8 @@ public class LoginController implements Initializable {
                 enableSignInButton();
             }
         });
+        textField.setOnKeyTyped(keyEvent -> textField.validate());
+        textField.setOnKeyTyped(keyEvent -> enableSignInButton());
     }
 
     private void setPasswordFieldValidator(JFXPasswordField passwordField) {
@@ -191,7 +198,8 @@ public class LoginController implements Initializable {
                 enableSignInButton();
             }
         });
-
+        passwordField.textProperty().addListener((observableValue, oldValue, newValue) -> passwordField.validate());
+        passwordField.textProperty().addListener((observableValue, oldValue, newValue) -> enableSignInButton());
     }
 
     private void enableSignInButton(){
