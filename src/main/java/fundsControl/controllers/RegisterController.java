@@ -21,6 +21,7 @@ import javafx.util.Duration;
 import org.controlsfx.control.Notifications;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -46,27 +47,23 @@ public class RegisterController implements Initializable {
     public static boolean isConfirmPasswordFieldValid = false;
     public static boolean isUsernameFieldValid = false;
 
-    private InputsValidator inputsValidator;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        inputsValidator = new InputsValidator();
         signUpBtn.setDisable(true);
         setEmailFieldValidators(emailField);
         setPasswordFieldValidators(passwordField);
         setConfPasswordFieldValidators(confPasswordField);
-        setUsernameFieldValidator(usernameField);
+        setUsernameFieldValidators(usernameField);
     }
 
     public void register(ActionEvent actionEvent) {
         String email = emailField.getText();
-        String password = passwordField.getText();
-        String confirmPassword = confPasswordField.getText();
+        String hashedPassword = BCrypt.hashpw(passwordField.getText(),BCrypt.gensalt());
         String name = usernameField.getText();
 
-        if (validateInputs(email, password, confirmPassword, name)) {
             if (!checkUserExist(emailField.getText())) {
-                User user = new User(email, password, name, new BigDecimal("0.00"));
+                User user = new User(email, hashedPassword, name, new BigDecimal("0.00"));
                 Session session = HibernateUtil.openSession();
                 session.getTransaction().begin();
                 session.save(user);
@@ -76,8 +73,6 @@ public class RegisterController implements Initializable {
             } else {
                 showErrorNotification();
             }
-        }
-
     }
 
     private boolean checkUserExist(String email) {
@@ -87,26 +82,6 @@ public class RegisterController implements Initializable {
         User user = (User) query.uniqueResult();
         session.close();
         return user != null;
-    }
-
-    private boolean validateInputs(String email, String password, String confirmPassword, String name) {
-        return validateEmail(email) && validatePassword(password) && validatePasswords(password, confirmPassword) && validateName(name);
-    }
-
-    private boolean validateEmail(String email) {
-        return inputsValidator.validateEmail(email);
-    }
-
-    private boolean validatePassword(String password) {
-        return inputsValidator.validatePassword(password);
-    }
-
-    private boolean validatePasswords(String password, String confirmPassword) {
-        return password.equals(confirmPassword);
-    }
-
-    private boolean validateName(String name) {
-        return !name.equals("");
     }
 
     public void cancelRegister(ActionEvent actionEvent) {
@@ -145,7 +120,7 @@ public class RegisterController implements Initializable {
     }
 
     private void setUsernameFieldValidators(JFXTextField textField) {
-
+        setUsernameFieldValidator(textField);
     }
 
     private void setRequiredFieldValidation(JFXPasswordField passwordField) {

@@ -1,6 +1,8 @@
 package fundsControl.controllers;
 
 import com.jfoenix.controls.*;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import fundsControl.models.Transactions;
 import fundsControl.models.TransactionsCategories;
 import fundsControl.models.User;
@@ -12,6 +14,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -22,7 +25,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+import org.controlsfx.control.Notifications;
 import org.hibernate.Session;
 
 import java.io.IOException;
@@ -80,16 +86,27 @@ public class AppController implements Initializable {
         VBox vbox = new VBox(10);
         vbox.setPadding(new Insets(10));
         Label trxDescription = new Label("Description");
+        trxDescription.setMinWidth(100);
+        trxDescription.setTextAlignment(TextAlignment.CENTER);
         Label trxCategoryName = new Label("Category");
+        trxCategoryName.setMinWidth(100);
+        trxCategoryName.setTextAlignment(TextAlignment.CENTER);
         Label trxAmount = new Label("Amount");
-        Label trxBalance = new Label("Balance before transactions");
+        trxAmount.setMinWidth(100);
+        trxAmount.setTextAlignment(TextAlignment.CENTER);
+        Label trxBalance = new Label("Balance after transactions");
+        trxBalance.setMinWidth(100);
+        trxBalance.setTextAlignment(TextAlignment.CENTER);
         Label trxDate = new Label("Transaction date");
+        trxDate.setMinWidth(100);
+        trxDate.setTextAlignment(TextAlignment.CENTER);
 
-        trxDescription.setFont(new Font("Arial", 15));
-        trxCategoryName.setFont(new Font("Arial", 15));
-        trxAmount.setFont(new Font("Arial", 15));
-        trxBalance.setFont(new Font("Arial", 15));
-        trxDate.setFont(new Font("Arial", 15));
+
+//        trxDescription.setFont(new Font("Arial", 15));
+//        trxCategoryName.setFont(new Font("Arial", 15));
+//        trxAmount.setFont(new Font("Arial", 15));
+//        trxBalance.setFont(new Font("Arial", 15));
+//        trxDate.setFont(new Font("Arial", 15));
         gridPane.add(trxDescription, 0, 0);
         gridPane.add(trxCategoryName, 1, 0);
         gridPane.add(trxAmount, 2, 0);
@@ -107,23 +124,34 @@ public class AppController implements Initializable {
         int i = 2;
         for (Transactions transaction : transactionsSet) {
             Label description = new Label(transaction.getDescription());
+            description.setTextAlignment(TextAlignment.CENTER);
             Label categoryName = new Label(transaction.getTransactionsCategories().getName());
+            categoryName.setTextAlignment(TextAlignment.CENTER);
             Label amount = new Label
                     (String.valueOf(
                             df.format(
                                     transaction.getAmount())));
+            if (transaction.isCredit()){
+                amount.setStyle("-fx-text-fill: green");
+            } else {
+                amount.setStyle("-fx-text-fill: red");
+            }
+            amount.setTextAlignment(TextAlignment.CENTER);
             Label balanceDiff = new Label(
                     String.valueOf(
                             df2.format(
                                     transaction.getBalanceDiff())));
+            balanceDiff.setTextAlignment(TextAlignment.CENTER);
             Label date = new Label(
                     String.valueOf(
                             simpleDateFormat.format(
                                     transaction.getTransactionDate())));
-
+            date.setTextAlignment(TextAlignment.CENTER);
             Button deleteBtn = new Button("Delete");
+            deleteBtn.setMinWidth(100);
             deleteBtn.setOnAction(actionEvent -> deleteTrx(transaction, getTransactionsToCalculateBalance(transaction, user.getTransactionsSet())));
             Button editBtn = new Button("Edit");
+            editBtn.setMinWidth(100);
             editBtn.setOnAction(actionEvent -> openEditTrxWindow(transaction));
             gridPane.add(description, 0, i, 1, 1);
             gridPane.add(categoryName, 1, i, 1, 1);
@@ -134,6 +162,7 @@ public class AppController implements Initializable {
             gridPane.add(deleteBtn, 6, i, 1, 1);
             ++i;
         }
+        gridPane.setAlignment(Pos.CENTER);
         vbox.getChildren().addAll(gridPane);
 
         scrollPane.setContent(vbox);
@@ -148,6 +177,7 @@ public class AppController implements Initializable {
             Stage newTrx = new Stage();
             newTrx.setScene(new Scene(root));
             newTrx.setTitle("Edit transaction");
+            newTrx.setOnHiding(windowEvent -> refreshData());
             newTrx.show();
 
         } catch (IOException e) {
@@ -158,14 +188,20 @@ public class AppController implements Initializable {
 
     public void initialize(URL url, ResourceBundle resourceBundle) {
         user = LoginController.user;
-        setUserData();
         loadTrx();
+        setUserData();
         categoriesFilterComboBox.setItems(FXCollections.observableArrayList(getCategoriesNames()));
     }
 
     public void setUserData() {
         this.userName.setText("Hello " + user.getName() + "!");
-        this.userBalance.setText("Your current balance is " + user.getBalance());
+        DecimalFormat df = new DecimalFormat("0,000.00");
+        this.userBalance.setText(String.valueOf(df.format(user.getBalance())));
+        if (user.getBalance().compareTo(BigDecimal.ZERO) < 0) {
+            userBalance.setStyle("-fx-text-fill: red");
+        } else {
+            userBalance.setStyle("-fx-text-fill: green");
+        }
     }
 
     public void openAddNewTrxWindow(ActionEvent actionEvent) {
@@ -176,10 +212,12 @@ public class AppController implements Initializable {
             Stage newTrx = new Stage();
             newTrx.setScene(new Scene(root));
             newTrx.setTitle("Add new transaction");
+            newTrx.setOnHiding(windowEvent -> refreshData());
             newTrx.show();
 
         } catch (IOException e) {
             e.printStackTrace();
+            showErrorNotification("Loading edit transaction window end with error, try again later");
         }
     }
 
@@ -191,16 +229,15 @@ public class AppController implements Initializable {
             newTrx.setScene(new Scene(root));
             newTrx.setTitle("Add new category");
             newTrx.setResizable(false);
-            newTrx.setOnHiding(windowEvent -> refreshData());
-            newTrx.setOnHidden(windowEvent -> refreshData());
             newTrx.show();
 
         } catch (IOException e) {
             e.printStackTrace();
+            showErrorNotification("Loading adding category window end with error, try again later");
         }
     }
 
-    public Set<Transactions> getTransactionsToCalculateBalance(Transactions transaction, Set<Transactions> transactionsSet) {
+     Set<Transactions> getTransactionsToCalculateBalance(Transactions transaction, Set<Transactions> transactionsSet) {
         Set<Transactions> newlyCalculatedTrxSet = new HashSet<>();
         for (Transactions trx : transactionsSet) {
             if (trx.getId() > transaction.getId()) {
@@ -210,13 +247,13 @@ public class AppController implements Initializable {
         return newlyCalculatedTrxSet;
     }
 
-    public List<Transactions> sortTrxList(Set<Transactions> transactionsSet) {
+     private List<Transactions> sortTrxList(Set<Transactions> transactionsSet) {
         List<Transactions> trxList = new ArrayList<>(transactionsSet);
         trxList.sort(Comparator.comparing(Transactions::getId));
         return trxList;
     }
 
-    public void deleteTrx(Transactions transaction, Set<Transactions> newlyCalculatedTrxSet) {
+     void deleteTrx(Transactions transaction, Set<Transactions> newlyCalculatedTrxSet) {
         Session session = HibernateUtil.openSession();
         session.getTransaction().begin();
         List<Transactions> trxList;
@@ -243,7 +280,7 @@ public class AppController implements Initializable {
         refreshData();
     }
 
-    public void refreshData() {
+     private void refreshData() {
         setUserData();
         loadTrx();
     }
@@ -257,16 +294,22 @@ public class AppController implements Initializable {
         return categoriesNames;
     }
 
-    private TransactionsCategories getTrxCategoryId(String categoryName) {
-        for (TransactionsCategories trxCat : this.transactionsCategoriesSet) {
-            if (trxCat.getName().equals(categoryName)) {
-                return trxCat;
-            }
-        }
-        return null;
-    }
-
     public void applyFilters() {
 
+    }
+
+    private void showErrorNotification(String text) {
+        Notifications notificationsBuilder = Notifications.create()
+                .title("Error occured")
+                .text(text)
+                .graphic(getErrorIcon())
+                .hideAfter(Duration.seconds(5))
+                .position(Pos.CENTER);
+        notificationsBuilder.showError();
+    }
+    private FontAwesomeIconView getErrorIcon() {
+        FontAwesomeIconView icon = new FontAwesomeIconView(FontAwesomeIcon.CLOSE);
+        icon.setStyle("-fx-background-color: red");
+        return icon;
     }
 }

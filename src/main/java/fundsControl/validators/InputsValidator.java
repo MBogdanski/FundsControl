@@ -11,6 +11,7 @@ public class InputsValidator {
     private static final String EMAIL_PATTERN =
             "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
                     + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+//    private static final String AMOUNT_PATTERN;
 
     public InputsValidator(){
     }
@@ -27,4 +28,8 @@ public class InputsValidator {
         matcher = emailPattern.matcher(email);
         return matcher.matches();
     }
+
+//    public static boolean validateAmount(final String amount) {
+//        Pattern amountPattern;
+//    }
 }

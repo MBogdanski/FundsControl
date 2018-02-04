@@ -10,26 +10,13 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane fx:id="mainAnchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="753.0" prefWidth="1202.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fundsControl.controllers.AppController">
+<AnchorPane fx:id="mainAnchor" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="856.0" prefWidth="1445.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fundsControl.controllers.AppController">
    <children>
-      <ScrollPane fx:id="scrollPane" layoutX="201.0" layoutY="167.0" prefHeight="386.0" prefWidth="695.0">
-        <content>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="384.0" prefWidth="689.0">
-               <children>
-               </children>
-            </AnchorPane>
-        </content>
-      </ScrollPane>
-      <Button fx:id="loadTrxBtn" layoutX="960.0" layoutY="303.0" mnemonicParsing="false" onAction="#loadTrx" prefHeight="44.0" prefWidth="165.0" text="Load Trx" />
-      <Label layoutX="227.0" layoutY="138.0" text="Description" />
-      <Label layoutX="371.0" layoutY="136.0" text="Category" />
-      <Label layoutX="517.0" layoutY="139.0" text="Kwota" />
-      <Label layoutX="659.0" layoutY="139.0" text="Balance after trx" />
-      <Label layoutX="828.0" layoutY="140.0" text="Date" />
-      <JFXButton fx:id="addTrx" alignment="CENTER" buttonType="RAISED" layoutX="959.0" layoutY="238.0" onAction="#openAddNewTrxWindow" prefHeight="44.0" prefWidth="182.0" style="-fx-background-color: #4286f4;" text="Add new transaction" textAlignment="CENTER" />
-      <JFXButton fx:id="addCategoryBtn" alignment="CENTER" buttonType="RAISED" layoutX="958.0" layoutY="174.0" onAction="#openAddNewCategoryWindow" prefHeight="44.0" prefWidth="182.0" ripplerFill="#0c2b0e" style="-fx-background-color: #4286f4;" text="Add new category" textAlignment="CENTER" />
+      <Button fx:id="loadTrxBtn" layoutX="1216.0" layoutY="291.0" mnemonicParsing="false" onAction="#loadTrx" prefHeight="44.0" prefWidth="165.0" text="Load Trx" />
+      <JFXButton fx:id="addTrx" alignment="CENTER" buttonType="RAISED" layoutX="1215.0" layoutY="235.0" onAction="#openAddNewTrxWindow" prefHeight="44.0" prefWidth="182.0" style="-fx-background-color: #4286f4;" text="Add new transaction" textAlignment="CENTER" />
+      <JFXButton fx:id="addCategoryBtn" alignment="CENTER" buttonType="RAISED" layoutX="1215.0" layoutY="174.0" onAction="#openAddNewCategoryWindow" prefHeight="44.0" prefWidth="182.0" ripplerFill="#0c2b0e" style="-fx-background-color: #4286f4;" text="Add new category" textAlignment="CENTER" />
       <Label fx:id="userName" alignment="CENTER" layoutX="28.0" layoutY="33.0" prefHeight="71.0" prefWidth="203.0" text="Label" />
-      <Label fx:id="userBalance" layoutX="563.0" layoutY="68.0" prefHeight="44.0" prefWidth="335.0" text="Label" />
+      <Label fx:id="userBalance" layoutX="605.0" layoutY="74.0" prefHeight="44.0" prefWidth="335.0" text="Label" />
       <Label alignment="CENTER" layoutX="49.0" layoutY="151.0" text="Transactions filters" />
       <JFXToggleButton fx:id="applyAmountFilter" layoutX="28.0" layoutY="184.0" onAction="#applyFilters" text="Apply amount" />
       <JFXTextField fx:id="filterFromAmountField" labelFloat="true" layoutX="25.0" layoutY="228.0" promptText="From amount" />
@@ -38,5 +25,7 @@
       <JFXToggleButton fx:id="applyCategoryFilter" layoutX="27.0" layoutY="325.0" onAction="#applyFilters" text="Apply category" />
       <JFXToggleButton fx:id="applyDateFilter" layoutX="30.0" layoutY="418.0" onAction="#applyFilters" text="Apply date" />
       <JFXTextField fx:id="filterToAmountField" labelFloat="true" layoutX="20.0" layoutY="277.0" promptText="To amount" />
+      <ScrollPane fx:id="scrollPane" layoutX="207.0" layoutY="140.0" maxWidth="1000.0" minWidth="850.0" prefHeight="466.0" prefWidth="920.0">
+      </ScrollPane>
    </children>
 </AnchorPane>
