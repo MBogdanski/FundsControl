@@ -73,6 +73,14 @@ public class AppController implements Initializable {
     public JFXDatePicker filterToDate;
     @FXML
     public JFXDatePicker filterFromDate;
+    @FXML
+    public Label outgoingsAmountLabel;
+    @FXML
+    public Label incomingsAmountLabel;
+    @FXML
+    public Label outgoinsAmountNumberLabel;
+    @FXML
+    public Label incomingsAmountNumberLabel;
 
     private boolean isAmountFilterOn = false;
     private boolean isCategoryFilterOn = false;
@@ -87,7 +95,7 @@ public class AppController implements Initializable {
         applyFilters();
     }
 
-    public void loadTrx(Set<Transactions> transactionsSet) {
+    private void loadTrx(Set<Transactions> transactionsSet) {
 
         Session session = HibernateUtil.openSession();
         session.refresh(user);
@@ -127,7 +135,9 @@ public class AppController implements Initializable {
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         DecimalFormat df = new DecimalFormat("#,###.00");
-        DecimalFormat df2 = new DecimalFormat("");
+        DecimalFormat df2 = new DecimalFormat(".00");
+        BigDecimal outgoingsAmount = new BigDecimal("0");
+        BigDecimal incomingsAmount = new BigDecimal("0");
         int i = 2;
         for (Transactions transaction : transactionsSet) {
             Label description = new Label(transaction.getDescription());
@@ -140,8 +150,10 @@ public class AppController implements Initializable {
                                     transaction.getAmount())));
             if (transaction.isCredit()) {
                 amount.setStyle("-fx-text-fill: green");
+                incomingsAmount = incomingsAmount.add(transaction.getAmount());
             } else {
                 amount.setStyle("-fx-text-fill: red");
+                outgoingsAmount = outgoingsAmount.add(transaction.getAmount());
             }
             amount.setTextAlignment(TextAlignment.CENTER);
             Label balanceDiff = new Label(
@@ -171,9 +183,26 @@ public class AppController implements Initializable {
         }
         gridPane.setAlignment(Pos.CENTER);
         vbox.getChildren().addAll(gridPane);
-
+        showTransactionsAmounts(outgoingsAmount, incomingsAmount);
         scrollPane.setContent(vbox);
         session.close();
+    }
+
+    private void showTransactionsAmounts(BigDecimal outgoingsAmount, BigDecimal incomingsAmount) {
+        DecimalFormat df = new DecimalFormat(".00");
+        if (outgoingsAmount.compareTo(BigDecimal.ZERO) == 0) {
+            outgoinsAmountNumberLabel.setText("0.00");
+        } else {
+            outgoinsAmountNumberLabel.setText(String.valueOf(df.format(outgoingsAmount)));
+            outgoinsAmountNumberLabel.setStyle("-fx-text-fill: red");
+        }
+
+        if (incomingsAmount.compareTo(BigDecimal.ZERO) == 0) {
+            incomingsAmountNumberLabel.setText("0.00");
+        } else {
+            incomingsAmountNumberLabel.setText(String.valueOf(df.format(incomingsAmount)));
+            incomingsAmountNumberLabel.setStyle("-fx-text-fill: green");
+        }
     }
 
     private void openEditTrxWindow(Transactions transaction) {
@@ -196,9 +225,9 @@ public class AppController implements Initializable {
         }
     }
 
-    public void setUserData() {
+    private void setUserData() {
         this.userName.setText("Hello " + user.getName() + "!");
-        DecimalFormat df = new DecimalFormat("0,000.00");
+        DecimalFormat df = new DecimalFormat(".00");
         this.userBalance.setText(String.valueOf(df.format(user.getBalance())));
         if (user.getBalance().compareTo(BigDecimal.ZERO) < 0) {
             userBalance.setStyle("-fx-text-fill: red");
@@ -398,8 +427,7 @@ public class AppController implements Initializable {
     private BigDecimal getAmountFrom(){
         if (!this.filterFromAmountField.getText().isEmpty()){
             try {
-                BigDecimal fromAmount = new BigDecimal(this.filterFromAmountField.getText());
-                return fromAmount;
+                return new BigDecimal(this.filterFromAmountField.getText());
             } catch (NumberFormatException e){
                 e.getMessage();
                 showErrorNotification("Wrong From Amount format");
@@ -411,8 +439,7 @@ public class AppController implements Initializable {
     private BigDecimal getToAmount() {
         if (!this.filterToAmountField.getText().isEmpty()){
             try {
-                BigDecimal toAmount = new BigDecimal(this.filterToAmountField.getText());
-                return toAmount;
+                return new BigDecimal(this.filterToAmountField.getText());
             } catch (NumberFormatException e){
                 e.getMessage();
                 showErrorNotification("Wrong To Amount format");
