@@ -177,18 +177,22 @@ public class AppController implements Initializable {
     }
 
     private void openEditTrxWindow(Transactions transaction) {
-        editTransaction = transaction;
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("fxmlFiles/editTrx.fxml"));
-        try {
-            Parent root = fxmlLoader.load();
-            Stage newTrx = new Stage();
-            newTrx.setScene(new Scene(root));
-            newTrx.setTitle("Edit transaction");
-            newTrx.setOnHiding(windowEvent -> refreshData());
-            newTrx.show();
+        if (isAmountFilterOn || isDateFilterOn || isCategoryFilterOn) {
+            showErrorNotification("Editing transactions is not available in filtered list");
+        } else {
+            editTransaction = transaction;
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getClassLoader().getResource("fxmlFiles/editTrx.fxml"));
+            try {
+                Parent root = fxmlLoader.load();
+                Stage newTrx = new Stage();
+                newTrx.setScene(new Scene(root));
+                newTrx.setTitle("Edit transaction");
+                newTrx.setOnHiding(windowEvent -> refreshData());
+                newTrx.show();
 
-        } catch (IOException e) {
-            e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -253,30 +257,34 @@ public class AppController implements Initializable {
     }
 
     void deleteTrx(Transactions transaction, Set<Transactions> newlyCalculatedTrxSet) {
-        Session session = HibernateUtil.openSession();
-        session.getTransaction().begin();
-        List<Transactions> trxList;
-        trxList = sortTrxList(newlyCalculatedTrxSet);
-        BigDecimal balanceBefore = transaction.getBalanceBefore();
-        BigDecimal userBalance = null;
-        for (Transactions trx : trxList) {
-            trx.setBalanceBefore(balanceBefore);
-            if (trx.isCredit()) {
-                trx.setBalanceDiff(trx.getBalanceBefore().add(trx.getAmount()));
-            } else {
-                trx.setBalanceDiff(trx.getBalanceBefore().subtract(trx.getAmount()));
+        if (isAmountFilterOn || isDateFilterOn || isCategoryFilterOn) {
+            showErrorNotification("Deleting transactions is not available in filtered list");
+        } else {
+            Session session = HibernateUtil.openSession();
+            session.getTransaction().begin();
+            List<Transactions> trxList;
+            trxList = sortTrxList(newlyCalculatedTrxSet);
+            BigDecimal balanceBefore = transaction.getBalanceBefore();
+            BigDecimal userBalance = null;
+            for (Transactions trx : trxList) {
+                trx.setBalanceBefore(balanceBefore);
+                if (trx.isCredit()) {
+                    trx.setBalanceDiff(trx.getBalanceBefore().add(trx.getAmount()));
+                } else {
+                    trx.setBalanceDiff(trx.getBalanceBefore().subtract(trx.getAmount()));
+                }
+                balanceBefore = trx.getBalanceDiff();
+                userBalance = trx.getBalanceDiff();
+                session.update(trx);
             }
-            balanceBefore = trx.getBalanceDiff();
-            userBalance = trx.getBalanceDiff();
-            session.update(trx);
+            user.setBalance(userBalance);
+            session.update(user);
+            session.delete(transaction);
+            session.getTransaction().commit();
+            session.refresh(user);
+            session.close();
+            refreshData();
         }
-        user.setBalance(userBalance);
-        session.update(user);
-        session.delete(transaction);
-        session.getTransaction().commit();
-        session.refresh(user);
-        session.close();
-        refreshData();
     }
 
     private void refreshData() {
