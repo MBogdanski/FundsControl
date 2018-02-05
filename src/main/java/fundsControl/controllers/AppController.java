@@ -329,10 +329,9 @@ public class AppController implements Initializable {
 
     private Set<Transactions> getFilteredTrxSet(Set<Transactions> transactionsSet){
         Set<Transactions> trxRemovingList = new HashSet<>();
-        String categoryName = categoriesFilterComboBox.getSelectionModel().getSelectedItem().toString();
         if (isCategoryFilterOn) {
             for (Transactions trx : transactionsSet) {
-                if (!trx.getTransactionsCategories().getName().equals(categoryName)){
+                if (!trx.getTransactionsCategories().getName().equals(categoriesFilterComboBox.getSelectionModel().getSelectedItem().toString())){
                     trxRemovingList.add(trx);
                 }
             }
@@ -357,7 +356,7 @@ public class AppController implements Initializable {
 
         if (fromAmount != null && toAmount != null){
             for (Transactions trx : transactionsSet) {
-                if (trx.getAmount().compareTo(fromAmount) == -1 && trx.getAmount().compareTo(toAmount) == 1) {
+                if (trx.getAmount().compareTo(fromAmount) <= 0 || trx.getAmount().compareTo(toAmount) >= 0) {
                     trxRemovingList.add(trx);
                 }
             }
@@ -367,7 +366,7 @@ public class AppController implements Initializable {
 
         if (fromAmount != null) {
             for (Transactions trx : transactionsSet) {
-                if (trx.getAmount().compareTo(fromAmount) == -1) {
+                if (trx.getAmount().compareTo(fromAmount) < 0) {
                     trxRemovingList.add(trx);
                 }
             }
@@ -377,7 +376,7 @@ public class AppController implements Initializable {
 
         if (toAmount != null) {
             for (Transactions trx : transactionsSet) {
-                if (trx.getAmount().compareTo(toAmount) == 1) {
+                if (trx.getAmount().compareTo(toAmount) > 0) {
                     trxRemovingList.add(trx);
                 }
             }
@@ -421,10 +420,10 @@ public class AppController implements Initializable {
 
         if (fromDate != null && toDate != null) {
             for (Transactions trx : transactionsSet) {
-                if (!trx.getTransactionDate().before(Date.from(fromDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()))
-                        && !trx.getTransactionDate().after(Date.from(toDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()))){
-                    trxRemovingList.add(trx);
-                }
+                if (!trx.getTransactionDate().after(Date.from(fromDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()))
+                        || !trx.getTransactionDate().before(Date.from(toDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()))) {
+                            trxRemovingList.add(trx);
+                        }
             }
             transactionsSet.removeAll(trxRemovingList);
             return transactionsSet;
@@ -432,7 +431,7 @@ public class AppController implements Initializable {
 
         if (fromDate != null) {
             for (Transactions trx : transactionsSet) {
-                if (!trx.getTransactionDate().before(Date.from(fromDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()))){
+                if (trx.getTransactionDate().before(Date.from(fromDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()))){
                     trxRemovingList.add(trx);
                 }
             }
@@ -442,7 +441,7 @@ public class AppController implements Initializable {
 
         if (toDate != null) {
             for (Transactions trx : transactionsSet) {
-                if (!trx.getTransactionDate().after(Date.from(toDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()))){
+                if (trx.getTransactionDate().after(Date.from(toDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()))){
                     trxRemovingList.add(trx);
                 }
             }
